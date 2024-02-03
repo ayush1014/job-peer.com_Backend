@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-
+const LeaderBoard = require('../models/LeaderBoard');
 exports.register = async (req, res) => {
     try {
         const { username, name, email, password } = req.body;
@@ -16,6 +16,10 @@ exports.register = async (req, res) => {
 
         // Create new user
         const newUser = await User.create({ username, name, email, password: hashedPassword });
+        await LeaderBoard.create({
+            username: username,
+            numberOfJobs: 0,
+        });
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {

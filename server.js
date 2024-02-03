@@ -6,6 +6,7 @@ const app = express();
 const routes = require('./routes/router')
 const User = require('./models/User');
 const Jobs = require('./models/Jobs');
+const LeaderBoard = require('./models/LeaderBoard')
 // const UserManyJobs = require('./models/UserManyJobs');
 
 //middleware

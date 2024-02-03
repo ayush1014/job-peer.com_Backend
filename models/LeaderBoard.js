@@ -22,4 +22,6 @@ const LeaderBoard = db.define('leaderBoard',{
         type: DataTypes.INTEGER,
         defaultValue: 0,
     }
-})
+});
+
+module.exports = LeaderBoard;
