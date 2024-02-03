@@ -1,17 +1,17 @@
 const {DataTypes, Sequelize} = require('sequelize');
 const db = require('../db_config/db');
 const User = require('./User');
-const Jobs = require('./Jobs');
+const LeaderBoard = require('./LeaderBoard');
 
-User.hasMany(Jobs, {
+User.hasOne(LeaderBoard,{
     foreignKey: 'username',
-    as: 'jobs',
+    as: 'numberOfJobs',
     onDelete: 'CASCADE'
 });
 
-Jobs.belongsTo(User, {
+LeaderBoard.belongsTo(User,{
     foreignKey: 'username',
-    as: 'user'
+    as:'user'
 });
 
-module.exports = { User, Jobs };
+module.exports = {User, LeaderBoard};

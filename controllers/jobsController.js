@@ -1,5 +1,6 @@
 const Jobs = require('../models/Jobs');
 const User = require('../models/User');
+const LeaderBoard = require('../models/LeaderBoard')
 const { Sequelize, Op } = require('sequelize');
 // const moment = require('moment');
 const moment = require('moment-timezone');
@@ -19,6 +20,18 @@ exports.job = async (req, res) => {
 
         // Create a new job associated with the username
         const newJob = await Jobs.create({ job_title, company_name, job_description, job_applied_link, username, appliedThrough });
+
+        const leaderBoardJobEntry = await LeaderBoard.findOne({
+            where: {
+                username
+            }
+        });
+        if (leaderBoardJobEntry) {
+            await leaderBoardJobEntry.increment('numberOfJobs');
+        }
+        else {
+            console.log('Leader Board entry not found for the user. Consider adding one')
+        }
 
         res.status(201).json({ message: 'Job saved successfully', job: newJob });
     } catch (error) {
@@ -103,19 +116,29 @@ exports.getUserJobs = async (req, res) => {
     }
 };
 
-
-
 exports.deleteUserJobs = async (req, res) => {
     try {
         let id = req.params.id;
-        await Jobs.destroy({ where: { id: id } })
-        console.log('job deleted')
-        res.send('job deleted')
+        const jobToDelete = await Jobs.findByPk(id);
+        if (!jobToDelete) {
+            return res.status(404).send('Job not found');
+        }
+        const { username } = jobToDelete;
+        await Jobs.destroy({ where: { id: id } });
+        console.log('Job deleted');
 
+        await LeaderBoard.decrement('numberOfJobs', { 
+            where: { 
+                username: username 
+            } 
+        });
+        console.log('numberOfJobs decremented successfully for user:', username);
+        res.send('Job deleted and numberOfJobs decremented successfully');
     } catch (error) {
-        console.error('error occured while deleting:', error)
+        console.error('Error occurred while deleting:', error);
+        res.status(500).send('An error occurred');
     }
-}
+};
 
 exports.editUserJobs = async (req, res) => {
     try {
@@ -224,7 +247,7 @@ exports.getJobStatsByTimeFrame = async (req, res) => {
             group: ['job_applied_date'],
             raw: true
         });
-    
+
         console.log("Raw Stats:", jobStats);
 
         let aggregatedStats = {};
@@ -233,23 +256,23 @@ exports.getJobStatsByTimeFrame = async (req, res) => {
             try {
                 let convertedDate = moment(stat.appliedDate).tz(timeZone);
                 let dateLabel = convertedDate.format(dateFormat);
-    
+
                 // Aggregate the job counts
                 if (!aggregatedStats[dateLabel]) {
                     aggregatedStats[dateLabel] = { date: dateLabel, jobCount: 0 };
                 }
                 aggregatedStats[dateLabel].jobCount += stat.jobCount;
-    
+
             } catch (e) {
                 console.error("Date Formatting Error:", e.message, "Raw Date:", stat.appliedDate);
             }
         });
-    
+
         // Converting the aggregated object back into an array
         const formattedStats = Object.values(aggregatedStats);
-    
+
         res.json(formattedStats);
-    
+
         // const formattedStats = jobStats.map(stat => {
         //     try {
         //         let convertedDate = moment(stat.appliedDate).tz(timeZone);
