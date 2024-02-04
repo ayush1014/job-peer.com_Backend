@@ -8,7 +8,7 @@ const User = require('./models/User');
 const Jobs = require('./models/Jobs');
 const LeaderBoard = require('./models/LeaderBoard')
 const Peer = require('./models/Peer')
-const { resetHourlyCounts, resetDailyCounts } = require('./controllers/jobLeaderBoardScheduling'); 
+const { resetHourlyCounts,resetSixHourCounts, resetDailyCounts, resetMonthlyCounts, resetYearlyCounts } = require('./controllers/jobLeaderBoardScheduling'); 
 // const UserManyJobs = require('./models/UserManyJobs');
 
 //middleware
@@ -23,7 +23,10 @@ const PORT = process.env.PORT || 8000;
 
 // Initialize scheduled tasks
 resetHourlyCounts();
+resetSixHourCounts();
 resetDailyCounts();
+resetMonthlyCounts();
+resetYearlyCounts();
 
 //Server
 app.listen(PORT, (err)=>{
