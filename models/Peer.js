@@ -1,34 +1,35 @@
-const { Sequelize, DataTypes} = require ('sequelize');
+// models/Peer.js
+const { Sequelize, DataTypes } = require('sequelize');
 const db = require('../db_config/db');
 
-const Peers = db.define('Peer',{
-    id:{
+const Peer = db.define('Peer', {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false
+        autoIncrement: true, 
+        allowNull: false,
     },
-
-    peer: {
+    requestedPeer: { 
         type: DataTypes.STRING,
+        allowNull: false,
         references: {
-            model: 'Users',
+            model: 'Users', 
             key: 'username'
         }
     },
-
-    requestPeer: {
+    requestingPeer: { 
         type: DataTypes.STRING,
-        references:{
-            model: 'Users',
+        allowNull: false,
+        references: {
+            model: 'Users', 
             key: 'username'
         }
     },
-
     peerConfirmed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
     }
-})
+});
 
-module.exports = Peers;
+module.exports = Peer;
