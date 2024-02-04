@@ -1,30 +1,28 @@
-const Sequelize  = require('sequelize');
+const {Sequelize, Op}  = require('sequelize');
+
 const Peer =  require('../models/Peer');
 const LeaderBoard = require('../models/LeaderBoard');
 const User = require('../models/User');
 
-exports.searchUser = async(req, res) =>{
-    try{
-        let user = req.params.username;
-        const userExists = await User.findByPk(user);
-        
-        if (!userExists){
-            return res.status(404).json({ error: 'User not Found!!'});
+exports.searchUser = async (req, res) => {
+    try {
+        const peerName = req.params.peerName;
+        const matchingUsers = await User.findAll({
+            where: {
+                username: {
+                    [Op.like]: `%${peerName}%` 
+                }
+            },
+            attributes: ['username', 'name', 'email'] 
+        });
+
+        if (matchingUsers.length === 0) {
+            return res.status(404).json({ error: 'No matching users found' });
         }
 
-        //Search functionality
-        let peerName = req.params.peerName;
-        const peerExists = await User.findByPk(peerName);
-        if (!peerExists){
-            return res.status(404).json({error: 'peer not found, recheck peer name'});
-        }
-        const searchPeer = {
-            username: peerExists.username,
-            name: peerExists.name,
-            email: peerExists.email
-        }
-        res.status(200).json(searchPeer);
-    } catch(error){
-        console.error('Searching Peer Error: ', error);
+        res.status(200).json(matchingUsers);
+    } catch (error) {
+        console.error('Searching User Error:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
