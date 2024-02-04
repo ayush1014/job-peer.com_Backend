@@ -7,6 +7,7 @@ const routes = require('./routes/router')
 const User = require('./models/User');
 const Jobs = require('./models/Jobs');
 const LeaderBoard = require('./models/LeaderBoard')
+const Peer = require('./models/Peer')
 // const UserManyJobs = require('./models/UserManyJobs');
 
 //middleware

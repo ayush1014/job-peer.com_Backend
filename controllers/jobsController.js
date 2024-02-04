@@ -27,7 +27,15 @@ exports.job = async (req, res) => {
             }
         });
         if (leaderBoardJobEntry) {
-            await leaderBoardJobEntry.increment('numberOfJobs');
+            await leaderBoardJobEntry.increment({
+                numberOfJobs: 1,
+                numberOfJobsHour: 1,
+                numberOfJobsSixHours: 1,
+                numberOfJobsDay: 1,
+                numberOfJobsWeek: 1,
+                numberOfJobsMonth: 1,
+                numberOfJobsYear: 1
+            });
         }
         else {
             console.log('Leader Board entry not found for the user. Consider adding one')
@@ -127,11 +135,20 @@ exports.deleteUserJobs = async (req, res) => {
         await Jobs.destroy({ where: { id: id } });
         console.log('Job deleted');
 
-        await LeaderBoard.decrement('numberOfJobs', { 
-            where: { 
-                username: username 
-            } 
-        });
+        await LeaderBoard.findOne({ where: { username: username } })
+            .then(leaderBoardEntry => {
+                if (leaderBoardEntry) {
+                    return leaderBoardEntry.decrement({
+                        numberOfJobs: 1,
+                        numberOfJobsHour: 1,
+                        numberOfJobsSixHours: 1,
+                        numberOfJobsDay: 1,
+                        numberOfJobsWeek: 1,
+                        numberOfJobsMonth: 1,
+                        numberOfJobsYear: 1
+                    });
+                }
+            });
         console.log('numberOfJobs decremented successfully for user:', username);
         res.send('Job deleted and numberOfJobs decremented successfully');
     } catch (error) {
