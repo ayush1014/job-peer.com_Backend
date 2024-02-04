@@ -8,6 +8,7 @@ const User = require('./models/User');
 const Jobs = require('./models/Jobs');
 const LeaderBoard = require('./models/LeaderBoard')
 const Peer = require('./models/Peer')
+const { resetHourlyCounts, resetDailyCounts } = require('./controllers/jobLeaderBoardScheduling'); 
 // const UserManyJobs = require('./models/UserManyJobs');
 
 //middleware
@@ -19,6 +20,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Port
 const PORT = process.env.PORT || 8000;
+
+// Initialize scheduled tasks
+resetHourlyCounts();
+resetDailyCounts();
 
 //Server
 app.listen(PORT, (err)=>{
