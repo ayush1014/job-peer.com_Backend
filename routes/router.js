@@ -19,4 +19,5 @@ router.get('/jobDetail/:username/:id', jobController.showJobDetailsSingle);
 router.get('/searchPeer/:username/:peerName', jobPeerController.searchUser);
 router.get('/peerFollow/:username/:peerName', jobPeerController.PeerFollow);
 router.put('/peerFollowed/:username/:peerName', jobPeerController.ConfirmPeerFollow);
+router.get('/confirmedPeer/:username', jobPeerController.ShowConfirmedPeer);
 module.exports = router;

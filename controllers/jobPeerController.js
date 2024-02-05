@@ -83,3 +83,24 @@ exports.ConfirmPeerFollow = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.ShowConfirmedPeer = async (req, res)=>{
+    try{
+        const username = req.params;
+
+        const checkUser = await User.findOne(username);
+        if(!checkUser){
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const confirmedUsers = await Peer.findAll({
+            where: {
+                peerConfirmed : true
+            }
+        })
+        return res.status(200).json(confirmedUsers);
+
+    }catch(error){
+        console.error('error searching user: ', error)
+    }
+}
