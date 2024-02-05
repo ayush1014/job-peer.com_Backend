@@ -18,6 +18,11 @@ const LeaderBoard = db.define('leaderBoard',{
         }
     },
 
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+
     numberOfJobs: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

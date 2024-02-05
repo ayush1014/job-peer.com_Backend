@@ -18,6 +18,7 @@ exports.register = async (req, res) => {
         const newUser = await User.create({ username, name, email, password: hashedPassword });
         await LeaderBoard.create({
             username: username,
+            name: name,
             numberOfJobs: 0,
         });
 
