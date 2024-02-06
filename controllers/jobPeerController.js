@@ -2,6 +2,7 @@ const {Sequelize, Op}  = require('sequelize');
 const LeaderBoard = require('../models/LeaderBoard');
 const User = require('../models/User');
 const Peer = require('../models/Peer');
+const Notification = require('../models/Notification')
 
 exports.searchUser = async (req, res) => {
     try {
@@ -53,6 +54,12 @@ exports.PeerFollow = async (req, res) => {
         });
 
         if (created) {
+            // Send a notification to the requestedPeer
+            await Notification.create({
+                sender: username,
+                receiver: peerName,
+                message: `${username} wants to add you as a peer.`,
+            });
             res.json({ message: "Follow request sent" });
         } else {
             res.json({ message: "Follow request already sent" });
@@ -62,6 +69,22 @@ exports.PeerFollow = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+// exports.GetNotification = async (req, res) => {
+//     const receiver = req.params.username;
+//     try {
+//         const notifications = await Notification.findAll({
+//           where: {
+//             receiver,
+//             read: false, // Optionally fetch only unread notifications
+//           },
+//         });
+//         res.json(notifications);
+//       } catch (error) {
+//         console.error('Error fetching notifications:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//       }
+// }
 
 exports.CheckRequestSend = async (req, res) => {
     try {
