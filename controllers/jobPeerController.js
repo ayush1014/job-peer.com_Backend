@@ -84,23 +84,45 @@ exports.ConfirmPeerFollow = async (req, res) => {
     }
 };
 
-exports.ShowConfirmedPeer = async (req, res)=>{
-    try{
-        const username = req.params;
+const db = require('../db_config/db'); // Ensure you have a db instance from Sequelize
 
-        const checkUser = await User.findOne(username);
-        if(!checkUser){
-            return res.status(404).json({ error: 'User not found' });
+exports.ShowConfirmedPeer = async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        // Fetch confirmed peers
+        const confirmedPeers = await db.query(`
+            SELECT * FROM Peers WHERE
+            (requestedPeer = :username OR requestingPeer = :username) AND
+            peerConfirmed = true
+        `, { 
+            replacements: { username: username },
+            type: db.QueryTypes.SELECT 
+        });
+
+        // Now, fetch LeaderBoard details separately
+        for (const peer of confirmedPeers) {
+            // Assuming you want LeaderBoard for both requestedPeer and requestingPeer
+            const requestedPeerLeaderBoard = await LeaderBoard.findOne({ where: { username: peer.requestedPeer } });
+            const requestingPeerLeaderBoard = await LeaderBoard.findOne({ where: { username: peer.requestingPeer } });
+
+            // Attach LeaderBoard details to the peer object
+            peer.requestedPeerLeaderBoard = requestedPeerLeaderBoard;
+            peer.requestingPeerLeaderBoard = requestingPeerLeaderBoard;
         }
 
-        const confirmedUsers = await Peer.findAll({
-            where: {
-                peerConfirmed : true
-            }
-        })
-        return res.status(200).json(confirmedUsers);
-
-    }catch(error){
-        console.error('error searching user: ', error)
+        return res.json(confirmedPeers);
+    } catch (error) {
+        console.error('Error fetching confirmed peers:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
+
+
+// exports.UnAddUser = async (req, res)=>{
+//     try{
+
+//     }catch(error){
+//         console.log(error)
+//     }
+// }

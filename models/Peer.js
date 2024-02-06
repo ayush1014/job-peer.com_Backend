@@ -1,4 +1,3 @@
-// models/Peer.js
 const { Sequelize, DataTypes } = require('sequelize');
 const db = require('../db_config/db');
 
