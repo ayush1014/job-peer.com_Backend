@@ -8,6 +8,7 @@ const User = require('./models/User');
 const Jobs = require('./models/Jobs');
 const LeaderBoard = require('./models/LeaderBoard')
 const Peer = require('./models/Peer')
+const Notification = require('./models/Notification')
 const { resetHourlyCounts,resetSixHourCounts, resetDailyCounts, resetMonthlyCounts, resetYearlyCounts } = require('./controllers/jobLeaderBoardScheduling'); 
 // const UserManyJobs = require('./models/UserManyJobs');
 
