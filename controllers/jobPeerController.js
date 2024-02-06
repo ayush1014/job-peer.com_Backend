@@ -6,10 +6,13 @@ const Peer = require('../models/Peer');
 exports.searchUser = async (req, res) => {
     try {
         const peerName = req.params.peerName;
+        const excludeUser = req.params.username;
+
         const matchingUsers = await User.findAll({
             where: {
                 username: {
-                    [Op.like]: `%${peerName}%` 
+                    [Op.like]: `%${peerName}%`,
+                    [Op.ne]: excludeUser 
                 }
             },
             attributes: ['username', 'name', 'email'] 
@@ -60,6 +63,31 @@ exports.PeerFollow = async (req, res) => {
     }
 };
 
+exports.CheckRequestSend = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const peerName = req.params.peerName;
+
+        const checkRequest = await Peer.findOne({
+            where: {
+                requestingPeer: username,
+                requestedPeer: peerName
+            }
+        });
+
+        // Check if the request exists
+        if (checkRequest) {
+            // If the request exists, send a response indicating the request has been sent
+            res.json({ reqSend: true });
+        } else {
+            // If the request does not exist, send a response indicating no request has been sent
+            res.json({ reqSend: false });
+        }
+    } catch (error) {
+        console.log('Error checking request:', error);
+        res.status(500).json({ message: 'Error checking request' });
+    }
+};
 
 
 exports.ConfirmPeerFollow = async (req, res) => {
@@ -85,6 +113,20 @@ exports.ConfirmPeerFollow = async (req, res) => {
 };
 
 const db = require('../db_config/db'); // Ensure you have a db instance from Sequelize
+
+exports.UnConfirmPeerFollow = async (req, res) => {
+    try{
+        const { username, peerName } = req.params;
+        const unFollowing = await Peer.destroy({
+            where: {
+                requestedPeer: peerName,
+                requestingPeer: username
+            }});
+        res.send('unfollowed successfull')
+    } catch(error){
+        console.log('error occurred while unfollowing peer')
+    }
+}
 
 exports.ShowConfirmedPeer = async (req, res) => {
     try {

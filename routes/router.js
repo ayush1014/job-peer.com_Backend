@@ -20,4 +20,7 @@ router.get('/searchPeer/:username/:peerName', jobPeerController.searchUser);
 router.get('/peerFollow/:username/:peerName', jobPeerController.PeerFollow);
 router.put('/peerFollowed/:username/:peerName', jobPeerController.ConfirmPeerFollow);
 router.get('/confirmedPeer/:username', jobPeerController.ShowConfirmedPeer);
+router.delete('/peerUnFollow/:username/:peerName', jobPeerController.UnConfirmPeerFollow);
+router.get('/checkRequest/:username/:peerName', jobPeerController.CheckRequestSend);
+
 module.exports = router;
