@@ -9,7 +9,8 @@ const Jobs = require('./models/Jobs');
 const LeaderBoard = require('./models/LeaderBoard')
 const Peer = require('./models/Peer')
 const Notification = require('./models/Notification')
-const { resetHourlyCounts,resetSixHourCounts, resetDailyCounts, resetMonthlyCounts, resetYearlyCounts } = require('./controllers/jobLeaderBoardScheduling'); 
+const {resetCounts} = require('./controllers/jobLeaderBoardScheduling'); 
+
 // const UserManyJobs = require('./models/UserManyJobs');
 
 //middleware
@@ -23,11 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 8000;
 
 // Initialize scheduled tasks
-resetHourlyCounts();
-resetSixHourCounts();
-resetDailyCounts();
-resetMonthlyCounts();
-resetYearlyCounts();
+resetCounts()
+console.log('running job delete automation')
 
 //Server
 app.listen(PORT, (err)=>{

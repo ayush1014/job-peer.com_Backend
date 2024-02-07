@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, timezone } = req.body;
 
         // Find user by username
         const user = await User.findByPk(username);
@@ -44,13 +44,18 @@ exports.login = async (req, res) => {
             return res.status(401).send('Invalid Password');
         }
 
+        // Update user's timezone
+        if (timezone) {
+            await User.update({ timezone }, { where: { username } });
+        }
+
         // Respond with user details (excluding password)
-        const userWithoutPassword = { ...user.dataValues };
+        const userWithoutPassword = { ...user.dataValues, timezone }; // Include updated timezone
         delete userWithoutPassword.password;
         res.status(200).json(userWithoutPassword);
         
     } catch (error) {
-        console.error(error)
+        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
