@@ -21,8 +21,13 @@ const User = db.define('User',{
     password: {
         type: DataTypes.STRING,
         allowNull: false
-    }
-    
+    },
+
+    timezone: {
+        type: DataTypes.STRING,
+        allowNull: true, // Depending on whether you want this field to be mandatory or not
+      }
+      
 });
 
 
