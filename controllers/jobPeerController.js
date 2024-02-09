@@ -67,6 +67,17 @@ exports.PeerFollow = async (req, res) => {
                 status: 'unread', // Default status
             });
 
+            const updateNotificationCount = async (username) => {
+                const io = getIO();
+                const count = await Notification.count({
+                  where: { receiver: username, status: 'unread' }
+                });
+              
+                io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
+              };
+
+            await updateNotificationCount(peerName);
+
             io.to(peerName).emit('notification', {
                 from: username,
                 message: `${username} wants to add you as a peer.`,
@@ -189,7 +200,18 @@ exports.GetNotifications = async (req, res) => {
             where: { receiver: username, status: 'unread' },
             order: [['createdAt', 'DESC']]
         });
+
+        const updateNotificationCount = async (username) => {
+            const io = getIO();
+            const count = await Notification.count({
+              where: { receiver: username, status: 'unread' }
+            });
+          
+            io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
+          };
+          await updateNotificationCount(username);
         res.json(notifications);
+
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -199,12 +221,37 @@ exports.GetNotifications = async (req, res) => {
 exports.DeleteNotification = async (req, res)=>{
     try{
         const id = req.params.id;
+        const notification = await Notification.findByPk(id);
         const deleteNotification = await Notification.destroy({
             where: { id : id }
-        })    
+        });
+        const receiverUsername = notification.receiver;
+        const updateNotificationCount = async (username) => {
+            const io = getIO();
+            const count = await Notification.count({
+              where: { receiver: username, status: 'unread' }
+            });
+          
+            io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
+          };
+        await updateNotificationCount(receiverUsername);   
     }
     catch (error){
         console.error('Error deteling Notification');
         res.status(500).json({error: 'Internal Server Error'})
     }
 }
+
+
+exports.getNotificationCount = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const count = await Notification.count({
+            where: { receiver: username }
+        });
+        res.json({ count });
+    } catch (error) {
+        console.error('Error fetching notification count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
