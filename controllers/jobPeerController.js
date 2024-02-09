@@ -3,6 +3,9 @@ const LeaderBoard = require('../models/LeaderBoard');
 const User = require('../models/User');
 const Peer = require('../models/Peer');
 const Notification = require('../models/Notification')
+const { getIO } = require('../socket')
+
+
 
 exports.searchUser = async (req, res) => {
     try {
@@ -31,6 +34,7 @@ exports.searchUser = async (req, res) => {
 };
 
 exports.PeerFollow = async (req, res) => {
+    const io = getIO();
     try {
         const { username, peerName } = req.params;
 
@@ -54,11 +58,10 @@ exports.PeerFollow = async (req, res) => {
         });
 
         if (created) {
-            // Send a notification to the requestedPeer
-            await Notification.create({
-                sender: username,
-                receiver: peerName,
+            io.to(peerName).emit('notification', {
+                from: username,
                 message: `${username} wants to add you as a peer.`,
+                action: 'peerRequest'
             });
             res.json({ message: "Follow request sent" });
         } else {
