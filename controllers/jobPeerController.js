@@ -195,3 +195,16 @@ exports.GetNotifications = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.DeleteNotification = async (req, res)=>{
+    try{
+        const id = req.params.id;
+        const deleteNotification = await Notification.destroy({
+            where: { id : id }
+        })    
+    }
+    catch (error){
+        console.error('Error deteling Notification');
+        res.status(500).json({error: 'Internal Server Error'})
+    }
+}
