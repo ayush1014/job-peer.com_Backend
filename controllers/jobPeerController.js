@@ -1,4 +1,4 @@
-const {Sequelize, Op}  = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 const LeaderBoard = require('../models/LeaderBoard');
 const User = require('../models/User');
 const Peer = require('../models/Peer');
@@ -16,10 +16,10 @@ exports.searchUser = async (req, res) => {
             where: {
                 username: {
                     [Op.like]: `%${peerName}%`,
-                    [Op.ne]: excludeUser 
+                    [Op.ne]: excludeUser
                 }
             },
-            attributes: ['username', 'name', 'email'] 
+            attributes: ['username', 'name', 'email']
         });
 
         if (matchingUsers.length === 0) {
@@ -58,10 +58,20 @@ exports.PeerFollow = async (req, res) => {
         });
 
         if (created) {
+            const notificationMessage = `${username} wants to add you as a peer.`;
+            // Save notification in the database
+            const newNotification = await Notification.create({
+                sender: username,
+                receiver: peerName,
+                message: notificationMessage,
+                status: 'unread', // Default status
+            });
+
             io.to(peerName).emit('notification', {
                 from: username,
                 message: `${username} wants to add you as a peer.`,
-                action: 'peerRequest'
+                action: 'peerRequest',
+                id: newNotification.id
             });
             res.json({ message: "Follow request sent" });
         } else {
@@ -72,22 +82,6 @@ exports.PeerFollow = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
-// exports.GetNotification = async (req, res) => {
-//     const receiver = req.params.username;
-//     try {
-//         const notifications = await Notification.findAll({
-//           where: {
-//             receiver,
-//             read: false, // Optionally fetch only unread notifications
-//           },
-//         });
-//         res.json(notifications);
-//       } catch (error) {
-//         console.error('Error fetching notifications:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//       }
-// }
 
 exports.CheckRequestSend = async (req, res) => {
     try {
@@ -141,15 +135,16 @@ exports.ConfirmPeerFollow = async (req, res) => {
 const db = require('../db_config/db'); // Ensure you have a db instance from Sequelize
 
 exports.UnConfirmPeerFollow = async (req, res) => {
-    try{
+    try {
         const { username, peerName } = req.params;
         const unFollowing = await Peer.destroy({
             where: {
                 requestedPeer: peerName,
                 requestingPeer: username
-            }});
+            }
+        });
         res.send('unfollowed successfull')
-    } catch(error){
+    } catch (error) {
         console.log('error occurred while unfollowing peer')
     }
 }
@@ -163,9 +158,9 @@ exports.ShowConfirmedPeer = async (req, res) => {
             SELECT * FROM Peers WHERE
             (requestedPeer = :username OR requestingPeer = :username) AND
             peerConfirmed = true
-        `, { 
+        `, {
             replacements: { username: username },
-            type: db.QueryTypes.SELECT 
+            type: db.QueryTypes.SELECT
         });
 
         // Now, fetch LeaderBoard details separately
@@ -187,10 +182,16 @@ exports.ShowConfirmedPeer = async (req, res) => {
 };
 
 
-// exports.UnAddUser = async (req, res)=>{
-//     try{
-
-//     }catch(error){
-//         console.log(error)
-//     }
-// }
+exports.GetNotifications = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const notifications = await Notification.findAll({
+            where: { receiver: username, status: 'unread' },
+            order: [['createdAt', 'DESC']]
+        });
+        res.json(notifications);
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

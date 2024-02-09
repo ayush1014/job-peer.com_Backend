@@ -84,6 +84,12 @@ const bodyParser = require('body-parser');
 const db_connection = require('./db_config/db');
 const routes = require('./routes/router');
 const http = require('http');
+const User = require('./models/User');
+const Jobs = require('./models/Jobs');
+const LeaderBoard = require('./models/LeaderBoard')
+const Peer = require('./models/Peer')
+const Notification = require('./models/Notification')
+const { resetCounts } = require('./controllers/jobLeaderBoardScheduling');
 const app = express();
 const { init } = require('./socket'); // Ensure this path is correct
 
@@ -116,6 +122,10 @@ const server = http.createServer(app);
 
 // Initialize socket.io with the HTTP server
 init(server);
+
+// // Initialize scheduled tasks
+resetCounts()
+console.log('running job delete automation')
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {

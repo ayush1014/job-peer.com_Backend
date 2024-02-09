@@ -2,6 +2,12 @@ const Sequelize = require('sequelize');
 const db = require('../db_config/db'); // Assume you have a setup for Sequelize
 
 const Notification = db.define('notification', {
+  id: {
+    type:Sequelize.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true
+  },
   sender: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -14,8 +20,8 @@ const Notification = db.define('notification', {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  read: {
-    type: Sequelize.BOOLEAN,
+  status: {
+    type: Sequelize.STRING,
     defaultValue: false,
   },
 });

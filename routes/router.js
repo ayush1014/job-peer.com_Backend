@@ -22,5 +22,6 @@ router.put('/peerFollowed/:username/:peerName', jobPeerController.ConfirmPeerFol
 router.get('/confirmedPeer/:username', jobPeerController.ShowConfirmedPeer);
 router.delete('/peerUnFollow/:username/:peerName', jobPeerController.UnConfirmPeerFollow);
 router.get('/checkRequest/:username/:peerName', jobPeerController.CheckRequestSend);
+router.get('/notifications/:username', jobPeerController.GetNotifications);
 
 module.exports = router;
