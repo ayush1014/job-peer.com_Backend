@@ -101,9 +101,12 @@ exports.CheckRequestSend = async (req, res) => {
 
         const checkRequest = await Peer.findOne({
             where: {
-                requestingPeer: username,
-                requestedPeer: peerName
+                [Op.or]: [
+                    { requestingPeer: username, requestedPeer: peerName },
+                    { requestingPeer: peerName, requestedPeer: username }
+                ]
             }
+            
         });
 
         // Check if the request exists
@@ -298,3 +301,18 @@ exports.getNotificationCount = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.getUserLeaderboardDetails = async(req, res)=>{
+    try{
+        const username = req.params.username;
+
+        const getDetails = await LeaderBoard.findOne({
+            where:{
+                username: username
+            }
+        })
+        res.json(getDetails)
+    }catch(error){
+        console.log('error: ', error)
+    }
+}
