@@ -24,6 +24,7 @@ const Notification = db.define('notification', {
     type: Sequelize.STRING,
     defaultValue: false,
   },
+  
 });
 
 module.exports = Notification;

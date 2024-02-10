@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Peer = require('../models/Peer');
 const Notification = require('../models/Notification')
 const { getIO } = require('../socket')
-
+const db = require('../db_config/db'); 
 
 
 exports.searchUser = async (req, res) => {
@@ -64,13 +64,13 @@ exports.PeerFollow = async (req, res) => {
                 sender: username,
                 receiver: peerName,
                 message: notificationMessage,
-                status: 'unread', // Default status
+                status: 'requestNoti', // Default status
             });
 
             const updateNotificationCount = async (username) => {
                 const io = getIO();
                 const count = await Notification.count({
-                    where: { receiver: username, status: 'unread' }
+                    where: { receiver: username }
                 });
 
                 io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
@@ -121,9 +121,32 @@ exports.CheckRequestSend = async (req, res) => {
 };
 
 
+// exports.ConfirmPeerFollow = async (req, res) => {
+//     try {
+//         const { username, peerName } = req.params;
+
+//         const [updated] = await Peer.update({ peerConfirmed: true }, {
+//             where: {
+//                 requestedPeer: peerName,
+//                 requestingPeer: username
+//             }
+//         });
+
+//         if (updated > 0) {
+//             res.json({ message: "Follow request confirmed" });
+//         } else {
+//             res.status(404).json({ message: "Follow request not found" });
+//         }
+//     } catch (error) {
+//         console.error('Error in ConfirmPeerFollow:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// };
+
 exports.ConfirmPeerFollow = async (req, res) => {
+    const io = getIO(); // Ensure you have access to your initialized socket.io instance
     try {
-        const { username, peerName } = req.params;
+        const { username, peerName } = req.params; // username is the receiver, peerName is the sender in this context
 
         const [updated] = await Peer.update({ peerConfirmed: true }, {
             where: {
@@ -133,6 +156,23 @@ exports.ConfirmPeerFollow = async (req, res) => {
         });
 
         if (updated > 0) {
+            // Assuming you also want to save this event as a notification in your database
+            await Notification.create({
+                sender: peerName, // receiver becomes the sender of this notification
+                receiver: username, // original sender becomes the receiver
+                message: `${peerName} has accepted your peer request.`,
+                status: 'acceptNoti'
+            });
+            console.log('notificaiton saved successfully')
+
+            // Emit an event to inform the original sender (peerName) that their request has been accepted
+            io.to(username).emit('notification', {
+                from: peerName,
+                message: `${peerName} has accepted your peer request.`,
+                action: 'peerAccepted'
+                // Include any other relevant information
+            });
+
             res.json({ message: "Follow request confirmed" });
         } else {
             res.status(404).json({ message: "Follow request not found" });
@@ -143,7 +183,8 @@ exports.ConfirmPeerFollow = async (req, res) => {
     }
 };
 
-const db = require('../db_config/db'); // Ensure you have a db instance from Sequelize
+
+
 
 exports.UnConfirmPeerFollow = async (req, res) => {
     try {
@@ -199,14 +240,14 @@ exports.GetNotifications = async (req, res) => {
     try {
         const username = req.params.username;
         const notifications = await Notification.findAll({
-            where: { receiver: username, status: 'unread' },
+            where: { receiver: username },
             order: [['createdAt', 'DESC']]
         });
 
         const updateNotificationCount = async (username) => {
             const io = getIO();
             const count = await Notification.count({
-                where: { receiver: username, status: 'unread' }
+                where: { receiver: username}
             });
 
             io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
@@ -231,7 +272,7 @@ exports.DeleteNotification = async (req, res) => {
         const updateNotificationCount = async (username) => {
             const io = getIO();
             const count = await Notification.count({
-                where: { receiver: username, status: 'unread' }
+                where: { receiver: username }
             });
 
             io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
