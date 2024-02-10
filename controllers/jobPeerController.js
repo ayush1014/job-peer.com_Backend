@@ -70,11 +70,11 @@ exports.PeerFollow = async (req, res) => {
             const updateNotificationCount = async (username) => {
                 const io = getIO();
                 const count = await Notification.count({
-                  where: { receiver: username, status: 'unread' }
+                    where: { receiver: username, status: 'unread' }
                 });
-              
+
                 io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
-              };
+            };
 
             await updateNotificationCount(peerName);
 
@@ -150,8 +150,10 @@ exports.UnConfirmPeerFollow = async (req, res) => {
         const { username, peerName } = req.params;
         const unFollowing = await Peer.destroy({
             where: {
-                requestedPeer: peerName,
-                requestingPeer: username
+                [Op.or]: [
+                    { requestedPeer: peerName, requestingPeer: username },
+                    { requestingPeer: peerName, requestedPeer: username }
+                ]
             }
         });
         res.send('unfollowed successfull')
@@ -204,12 +206,12 @@ exports.GetNotifications = async (req, res) => {
         const updateNotificationCount = async (username) => {
             const io = getIO();
             const count = await Notification.count({
-              where: { receiver: username, status: 'unread' }
+                where: { receiver: username, status: 'unread' }
             });
-          
+
             io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
-          };
-          await updateNotificationCount(username);
+        };
+        await updateNotificationCount(username);
         res.json(notifications);
 
     } catch (error) {
@@ -218,27 +220,27 @@ exports.GetNotifications = async (req, res) => {
     }
 };
 
-exports.DeleteNotification = async (req, res)=>{
-    try{
+exports.DeleteNotification = async (req, res) => {
+    try {
         const id = req.params.id;
         const notification = await Notification.findByPk(id);
         const deleteNotification = await Notification.destroy({
-            where: { id : id }
+            where: { id: id }
         });
         const receiverUsername = notification.receiver;
         const updateNotificationCount = async (username) => {
             const io = getIO();
             const count = await Notification.count({
-              where: { receiver: username, status: 'unread' }
+                where: { receiver: username, status: 'unread' }
             });
-          
+
             io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
-          };
-        await updateNotificationCount(receiverUsername);   
+        };
+        await updateNotificationCount(receiverUsername);
     }
-    catch (error){
+    catch (error) {
         console.error('Error deteling Notification');
-        res.status(500).json({error: 'Internal Server Error'})
+        res.status(500).json({ error: 'Internal Server Error' })
     }
 }
 
