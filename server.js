@@ -96,10 +96,10 @@ const { init } = require('./socket'); // Ensure this path is correct
 // Middleware
 app.use(cors({
     //   origin: 'http://localhost:3000',
-    origin: ["http://localhost:3000", "https://job-peer-com-frontend.vercel.app"],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: "https://job-peer-com-frontend.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept',
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
