@@ -239,30 +239,30 @@ exports.ShowConfirmedPeer = async (req, res) => {
 };
 
 
-exports.GetNotifications = async (req, res) => {
-    try {
-        const username = req.params.username;
-        const notifications = await Notification.findAll({
-            where: { receiver: username },
-            order: [['createdAt', 'DESC']]
-        });
+// exports.GetNotifications = async (req, res) => {
+//     try {
+//         const username = req.params.username;
+//         const notifications = await Notification.findAll({
+//             where: { receiver: username },
+//             order: [['createdAt', 'DESC']]
+//         });
 
-        const updateNotificationCount = async (username) => {
-            const io = getIO();
-            const count = await Notification.count({
-                where: { receiver: username}
-            });
+//         const updateNotificationCount = async (username) => {
+//             const io = getIO();
+//             const count = await Notification.count({
+//                 where: { receiver: username}
+//             });
 
-            io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
-        };
-        await updateNotificationCount(username);
-        res.json(notifications);
+//             io.to(username).emit('notificationCountUpdate', { count }); // Emit to a room named after the username
+//         };
+//         await updateNotificationCount(username);
+//         res.json(notifications);
 
-    } catch (error) {
-        console.error('Error fetching notifications:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
+//     } catch (error) {
+//         console.error('Error fetching notifications:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// };
 
 exports.DeleteNotification = async (req, res) => {
     try {
