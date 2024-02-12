@@ -15,9 +15,5 @@
         "dest": "/server.js"
       }
     ],
-    "env": {
-      "DATABASE_URL": "@database_url",
-      "NODE_ENV": "production"
-    },
     "regions": ["all"]
   }
