@@ -25,6 +25,7 @@ router.get('/checkRequest/:username/:peerName', jobPeerController.CheckRequestSe
 router.get('/notifications/:username', jobPeerController.GetNotifications);
 router.delete('/deleteNotification/:id', jobPeerController.DeleteNotification);
 router.get('/notifications/count/:username', jobPeerController.getNotificationCount);
-router.get('/leaderboardUser/:username', jobPeerController.getUserLeaderboardDetails)
+router.get('/leaderboardUser/:username', jobPeerController.getUserLeaderboardDetails);
+router.get('/peerCount/:username', jobPeerController.getPeerCount);
 
 module.exports = router;

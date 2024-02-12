@@ -316,3 +316,22 @@ exports.getUserLeaderboardDetails = async(req, res)=>{
         console.log('error: ', error)
     }
 }
+
+exports.getPeerCount = async (req, res) => {
+    try {
+        const username = req.params.username;
+        const count = await Peer.count({
+            where: {
+                [Op.or]: [
+                    { requestedPeer: username },
+                    { requestingPeer: username }
+                ],
+                peerConfirmed: true
+            }
+        });
+        res.json({ peerCount: count });
+    } catch (error) {
+        console.error('Error fetching peer count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
