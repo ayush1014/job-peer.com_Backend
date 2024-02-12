@@ -5,8 +5,7 @@ let io;
 function init(httpServer) {
     io = new Server(httpServer, {
         cors: {
-            // origin: ["http://localhost:3000", "https://job-peer-com-frontend.vercel.app"],
-            origin: ["http://localhost:3000", "job-peer.onrender.com:10000"],
+            origin: ["http://localhost:3000", "https://job-peer-com-frontend.vercel.app"],
             methods: ["GET", "POST", "PUT", "DELETE"],
             credentials: true
         }
