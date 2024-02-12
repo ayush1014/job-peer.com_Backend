@@ -1,13 +1,23 @@
 {
     "version": 2,
-    "builds": [ {
-        "src": "server.js",
-        "use": "@vercel/node"
+    "builds": [
+      {
+        "src": "package.json",
+        "use": "@vercel/node",
+        "config": {
+          "distDir": "build"
         }
+      }
     ],
-    "routes": [ {
-        "src": "/.*",
-        "dest": "/"
-        }
-    ]
-} 
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/server.js"
+      }
+    ],
+    "env": {
+      "DATABASE_URL": "@database_url",
+      "NODE_ENV": "production"
+    },
+    "regions": ["all"]
+  }
