@@ -147,10 +147,11 @@ exports.CheckRequestSend = async (req, res) => {
 // };
 
 exports.ConfirmPeerFollow = async (req, res) => {
-    const io = getIO(); // Ensure you have access to your initialized socket.io instance
+    const io = getIO(); // Access the initialized socket.io instance
     try {
-        const { username, peerName } = req.params; // username is the receiver, peerName is the sender in this context
-
+        const { username, peerName } = req.params; // username is the receiver, peerName is the sender
+        
+        // Update the peer confirmation status
         const [updated] = await Peer.update({ peerConfirmed: true }, {
             where: {
                 requestedPeer: peerName,
@@ -159,22 +160,26 @@ exports.ConfirmPeerFollow = async (req, res) => {
         });
 
         if (updated > 0) {
-            // Assuming you also want to save this event as a notification in your database
+            // Clear any existing notifications for this peer request
+            await Notification.destroy({
+                where: {
+                    sender: peerName,
+                    receiver: username,
+                    message: `${peerName} wants to add you as a peer.`
+                }
+            });
+
+            // Create a new notification for the acceptance
             await Notification.create({
-                sender: peerName, // receiver becomes the sender of this notification
-                receiver: username, // original sender becomes the receiver
-                message: `${peerName} has accepted your peer request.`,
+                sender: username,
+                receiver: peerName,
+                message: `${username} has accepted your peer request.`,
                 status: 'acceptNoti'
             });
-            console.log('notificaiton saved successfully')
 
-            // Emit an event to inform the original sender (peerName) that their request has been accepted
-            io.to(username).emit('notification', {
-                from: peerName,
-                message: `${peerName} has accepted your peer request.`,
-                action: 'peerAccepted'
-                // Include any other relevant information
-            });
+            // Emit an update to both users to refresh their notification lists
+            io.to(username).emit('notificationUpdate');
+            io.to(peerName).emit('notificationUpdate');
 
             res.json({ message: "Follow request confirmed" });
         } else {
@@ -185,7 +190,6 @@ exports.ConfirmPeerFollow = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-
 
 
 
