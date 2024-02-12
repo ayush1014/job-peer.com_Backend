@@ -31,26 +31,45 @@ const LeaderBoard = db.define('leaderBoard',{
     numberOfJobsHour: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
+        
     },
     numberOfJobsSixHours: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
     numberOfJobsDay: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
     numberOfJobsWeek: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
     numberOfJobsMonth: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
     numberOfJobsYear: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
 });
 
