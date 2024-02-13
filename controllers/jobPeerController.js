@@ -171,9 +171,9 @@ exports.ConfirmPeerFollow = async (req, res) => {
 
             // Create a new notification for the acceptance
             await Notification.create({
-                sender: username,
-                receiver: peerName,
-                message: `${username} has accepted your peer request.`,
+                sender: peerName,
+                receiver: username,
+                message: `${peerName} has accepted your peer request.`,
                 status: 'acceptNoti'
             });
 
