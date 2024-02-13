@@ -96,7 +96,7 @@ const { init } = require('./socket'); // Ensure this path is correct
 // Middleware
 app.use(cors({
     //   origin: 'http://localhost:3000',
-    origin:[ "https://www.job-peer.com/", "https://job-peer-com-frontend.vercel.app"],
+    origin:[ "https://job-peer.com/", "https://job-peer-com-frontend.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
