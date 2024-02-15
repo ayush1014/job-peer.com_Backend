@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const LeaderBoard = require('../models/LeaderBoard');
 exports.register = async (req, res) => {
     try {
-        const { username, name, email, password } = req.body;
+        const { username, name, email, password, timezone } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ where: { username } });
@@ -15,7 +15,7 @@ exports.register = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, 8);
 
         // Create new user
-        const newUser = await User.create({ username, name, email, password: hashedPassword });
+        const newUser = await User.create({ username, name, email, password: hashedPassword, timezone });
         await LeaderBoard.create({
             username: username,
             name: name,
