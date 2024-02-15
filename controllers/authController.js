@@ -7,7 +7,16 @@ exports.register = async (req, res) => {
 
         // Check if user already exists
         const existingUser = await User.findOne({ where: { username } });
+        const userTimezoneCheck = await User.findOne(
+            {where: {
+                username,
+                timezone
+            }}
+        )
         if (existingUser) {
+            if (!userTimezoneCheck){
+                await User.update({ timezone }, { where: { username } });
+           }
             return res.status(409).send('User already exists');
         }
 
@@ -16,6 +25,7 @@ exports.register = async (req, res) => {
 
         // Create new user
         const newUser = await User.create({ username, name, email, password: hashedPassword, timezone });
+
         await LeaderBoard.create({
             username: username,
             name: name,
