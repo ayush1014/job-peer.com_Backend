@@ -34,6 +34,7 @@ Jobs.belongsTo(User, {
 // Conversations.hasMany(UserConversations, { foreignKey: 'conversationId' });
 
 
+User.belongsToMany(Conversations, { through: UserConversations });
 Conversations.belongsToMany(User, { through: UserConversations });
 Conversations.hasMany(Messages);
 

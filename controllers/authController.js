@@ -6,19 +6,19 @@ exports.register = async (req, res) => {
         const { username, name, email, password, timezone } = req.body;
 
         // Check if user already exists
-        const existingUser = await User.findOne({ where: { username } });
-        const userTimezoneCheck = await User.findOne(
-            {where: {
-                username,
-                timezone
-            }}
-        )
-        if (existingUser) {
-            if (!userTimezoneCheck){
-                await User.update({ timezone }, { where: { username } });
-           }
-            return res.status(409).send('User already exists');
-        }
+        // const existingUser = await User.findOne({ where: { username } });
+        // const userTimezoneCheck = await User.findOne(
+        //     {where: {
+        //         username,
+        //         timezone
+        //     }}
+        // )
+        // if (existingUser) {
+        //     if (!userTimezoneCheck){
+        //         await User.update({ timezone }, { where: { username } });
+        //    }
+        //     return res.status(409).send('User already exists');
+        // }
 
         // Hash password
         const hashedPassword = bcrypt.hashSync(password, 8);
@@ -32,9 +32,9 @@ exports.register = async (req, res) => {
             numberOfJobs: 0,
         });
 
-        res.status(201).json({ message: 'User registered successfully' });
+        return res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 };
 
