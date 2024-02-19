@@ -3,6 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const jobController = require('../controllers/jobsController');
 const jobPeerController = require('../controllers/jobPeerController');
+const messagesController = require('../controllers/messagesController')
 
 //Auth Routes
 router.post('/register', authController.register);
@@ -27,5 +28,15 @@ router.delete('/deleteNotification/:id', jobPeerController.DeleteNotification);
 router.get('/notifications/count/:username', jobPeerController.getNotificationCount);
 router.get('/leaderboardUser/:username', jobPeerController.getUserLeaderboardDetails);
 router.get('/peerCount/:username', jobPeerController.getPeerCount);
+
+
+//messages routers
+router.post('/messages', messagesController.createMessage);
+router.get('/messages/:conversationId', messagesController.getMessages);
+router.delete('/messages/:id', messagesController.deleteMessage);
+router.post('/messages/:id/read', messagesController.markMessageAsRead);
+router.post('/conversations/:conversationId/users', messagesController.addUserToConversation);
+router.delete('/conversations/:conversationId/users/:userId', messagesController.removeUserFromConversation);
+router.get('/conversations/getOrCreate', messagesController.getConversationId);
 
 module.exports = router;
