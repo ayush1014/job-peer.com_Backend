@@ -34,9 +34,10 @@ router.get('/peerCount/:username', jobPeerController.getPeerCount);
 router.post('/messages', messagesController.createMessage);
 router.get('/messages/:conversationId', messagesController.getMessages);
 router.delete('/messages/:id', messagesController.deleteMessage);
-router.post('/messages/:id/read', messagesController.markMessageAsRead);
+router.post('/messages/markAsReadBulk', messagesController.markMessageAsRead);
 router.post('/conversations/:conversationId/users', messagesController.addUserToConversation);
 router.delete('/conversations/:conversationId/users/:userId', messagesController.removeUserFromConversation);
 router.get('/conversations/getOrCreate', messagesController.getConversationId);
+router.get('/unreadMessagesCount/:sender', messagesController.getUnreadMessageCount);
 
 module.exports = router;

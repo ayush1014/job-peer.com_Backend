@@ -102,22 +102,62 @@ async function deleteMessage(req, res) {
 }
 
 // POST /api/messages/:id/read
+// async function markMessageAsRead(req, res) {
+//     try {
+//         const { id } = req.params;
+//         const updated = await Messages.update({ isRead: true }, {
+//             where: { id }
+//         });
+//         if (updated[0] > 0) {
+//             res.send("Message marked as read");
+//         } else {
+//             res.status(404).send("Message not found");
+//         }
+//     } catch (error) {
+//         res.status(500).send(error.message);
+//     }
+// }
+
 async function markMessageAsRead(req, res) {
     try {
-        const { id } = req.params;
-        const updated = await Messages.update({ isRead: true }, {
-            where: { id }
-        });
-        if (updated[0] > 0) {
-            res.send("Message marked as read");
-        } else {
-            res.status(404).send("Message not found");
-        }
+        const { messageIds } = req.body;
+        await Messages.update({ isRead: true }, { where: { id: messageIds } });
+        res.json({ success: true });
     } catch (error) {
-        res.status(500).send(error.message);
+        console.error('Error marking messages as read:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 
+async function getUnreadMessageCount(req, res) {
+    try {
+        const sender = req.params.sender;
+        const count = await Messages.count({
+            where: {
+                sender: sender,
+                isRead: false
+            }
+        });
+        res.json({ unreadCount: count });
+    } catch (error) {
+        console.error('Error getting unread message count:', error);
+        res.status(500).send('Server error');
+    }
+}
+
+async function getUnreadMessageCountBySender(sender) {
+    try {
+        return await Messages.count({
+            where: {
+                sender: sender,
+                isRead: false
+            }
+        });
+    } catch (error) {
+        console.error('Error getting unread message count by sender:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     createMessage,
@@ -126,5 +166,7 @@ module.exports = {
     markMessageAsRead,
     addUserToConversation,
     removeUserFromConversation,
-    getConversationId
+    getConversationId,
+    getUnreadMessageCount,
+    getUnreadMessageCountBySender
 };
