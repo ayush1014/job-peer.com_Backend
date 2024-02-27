@@ -1,6 +1,10 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const LeaderBoard = require('../models/LeaderBoard');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const { Op } = require("sequelize");
+
 exports.register = async (req, res) => {
     try {
         const { username, name, email, password, timezone } = req.body;
@@ -69,3 +73,66 @@ exports.login = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+const transporter = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASS 
+    },
+});
+
+exports.forgetPassword = async (req, res) => {
+    const { email } = req.body;
+    console.log(email);
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).send('User not found.');
+    }   
+    // Generate a reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    // Set token validity for 1 hour
+    const expireTime = Date.now() + 3600000;    
+    await User.update({ resetPasswordToken: resetToken, resetPasswordExpires: expireTime }, { where: { email } });  
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const mailOptions = {
+      from: process.env.EMAIL_USERNAME,
+      to: user.email,
+      subject: 'Password Reset',
+      text: `Please click on the following link to reset your password: ${resetUrl}`,
+    };  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        return res.status(500).send('Error sending email');
+      } else {
+        console.log('Email sent: ' + info.response);
+        res.status(200).send('Recovery email sent');
+      }
+    });
+}
+
+// Handle incoming request from reset password URL
+exports.resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    console.log(token, password)
+    const user = await User.findOne({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { [Op.gt]: Date.now() },
+      },
+    });
+  
+    if (!user) {
+      return res.status(400).send('Token is invalid or has expired.');
+    }
+  
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    await User.update({ password: hashedPassword, resetPasswordToken: null, resetPasswordExpires: null }, { where: { email: user.email } });
+  
+    res.status(200).send('Password has been updated.');
+}

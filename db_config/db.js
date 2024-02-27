@@ -1,6 +1,6 @@
 const {Sequelize} = require('sequelize');
 require('dotenv').config();
-console.log('testing database', process.env.DB_NAME);
+// console.log('testing database', process.env.DB_NAME);
 
 const db = new Sequelize({
     username:process.env.DB_USER,

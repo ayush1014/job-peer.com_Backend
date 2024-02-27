@@ -26,7 +26,15 @@ const User = db.define('User',{
     timezone: {
         type: DataTypes.STRING,
         allowNull: true, // Depending on whether you want this field to be mandatory or not
-      }
+      },
+    resetPasswordToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    resetPasswordExpires: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
       
 });
 

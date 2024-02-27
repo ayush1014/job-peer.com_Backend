@@ -39,4 +39,8 @@ router.post('/conversations/:conversationId/users', messagesController.addUserTo
 router.delete('/conversations/:conversationId/users/:userId', messagesController.removeUserFromConversation);
 router.get('/conversations/getOrCreate', messagesController.getConversationId);
 
+//forget-password routes
+router.post('/forget-password', authController.forgetPassword);
+router.post('/reset-password/:token', authController.resetPassword);
+
 module.exports = router;
