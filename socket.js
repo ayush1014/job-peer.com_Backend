@@ -7,8 +7,8 @@ let io;
 function init(httpServer) {
     io = new Server(httpServer, {
         cors: {
-            // origin: "http://localhost:3000",
-            origin:"https://www.job-peer.com",
+            origin: process.env.FRONTEND_URL,
+            // origin:"https://www.job-peer.com",
             methods: ["GET", "POST", "PUT", "DELETE"],
             credentials: true
         }

@@ -40,4 +40,8 @@ router.delete('/conversations/:conversationId/users/:userId', messagesController
 router.get('/conversations/getOrCreate', messagesController.getConversationId);
 router.get('/unreadMessagesCount/:sender', messagesController.getUnreadMessageCount);
 
+//forget-password routes
+router.post('/forget-password', authController.forgetPassword);
+router.post('/reset-password/:token', authController.resetPassword);
+
 module.exports = router;
