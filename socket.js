@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const { createMessage } = require('./controllers/messagesController');
 const {getUnreadMessageCountBySender} = require('./controllers/messagesController');
+require('dotenv').config();
 
 let io;
 

@@ -16,7 +16,9 @@ const Conversations = require('./models/Conversations');
 const { resetCounts } = require('./controllers/jobLeaderBoardScheduling');
 const app = express();
 const { init } = require('./socket'); 
+require('dotenv').config();
 
+console.log("process.env.FRONTEND_URL: ", process.env.FRONTEND_URL)
 // Middleware
 app.use(cors({
     origin: process.env.FRONTEND_URL,
