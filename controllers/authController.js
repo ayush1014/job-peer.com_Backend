@@ -101,7 +101,37 @@ exports.forgetPassword = async (req, res) => {
       from: process.env.EMAIL_USERNAME,
       to: user.email,
       subject: 'Password Reset',
-      text: `Please click on the following link to reset your password: ${resetUrl}`,
+      text: `Dear User,
+    
+    We received a request to reset the password for your account. If you did not make this request, please ignore this email.
+    
+    To reset your password, please click on the following link: ${resetUrl}
+    
+    This link will expire in 24 hours for security reasons.
+    
+    Thank you for using our services.
+    
+    Best Regards,
+    Your Company Name`,
+      html: `<!DOCTYPE html>
+    <html>
+    <body>
+    <p>Dear User,</p>
+    
+    <p>We received a request to reset the password for your account. If you did not make this request, please ignore this email.</p>
+    
+    <p>To reset your password, please click on the link below:</p>
+    
+    <p><a href="${resetUrl}">Reset Password</a></p>
+    
+    <p>This link will expire in 1 hour for security reasons.</p>
+    
+    <p>Thank you for using our services.</p>
+    
+    <p>Best Regards,<br>
+    Job Peer Team</p>
+    </body>
+    </html>`,
     };  
     transporter.sendMail(mailOptions, function(error, info){
       if (error) {
